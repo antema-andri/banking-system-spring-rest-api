@@ -31,7 +31,7 @@ public class AppServiceImpl implements AppService{
                 bankAccountService.createCurrentAccount(Math.random()*250000, customer.getId(), Math.random()*500000);
                 bankAccountService.createSavingAccount(Math.random()*355000, customer.getId(), Math.random()*500000);
             } catch (CustomerNotFoundException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }
         /* create operations */
