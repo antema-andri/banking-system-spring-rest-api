@@ -1,7 +1,7 @@
 package com.backend.bankingsystem.web;
 
 import com.backend.bankingsystem.dao.CustomerRepository;
-import com.backend.bankingsystem.mapper.CustomerMapper;
+import com.backend.bankingsystem.mapper.EntityMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class HomeController {
     private final CustomerRepository customerRepository;
-    private final CustomerMapper customerMapper;
+    private final EntityMapper entityMapper;
 
     @GetMapping("/health")
     public String test(){

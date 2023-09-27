@@ -1,5 +1,6 @@
 package com.backend.bankingsystem.service;
 
+import com.backend.bankingsystem.dto.CustomerDTO;
 import com.backend.bankingsystem.exceptions.BalanceNotSufficientException;
 import com.backend.bankingsystem.exceptions.BankAccountNotFoundException;
 import com.backend.bankingsystem.exceptions.CustomerNotFoundException;
@@ -19,10 +20,10 @@ public class AppServiceImpl implements AppService{
     @Override
     public void loadData() {
         Stream.of("custom1", "custom2", "custom3").forEach(name->{
-            Customer customer=new Customer();
-            customer.setName(name);
-            customer.setEmail(name+"@gmail.com");
-            bankAccountService.saveCustomer(customer);
+            CustomerDTO customerDTO=new CustomerDTO();
+            customerDTO.setName(name);
+            customerDTO.setEmail(name+"@gmail.com");
+            bankAccountService.saveCustomer(customerDTO);
         });
         /* create accounts */
         List<Customer> customerList=bankAccountService.listCustomers();
