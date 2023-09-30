@@ -1,6 +1,5 @@
 package com.backend.bankingsystem.utils;
 
-import com.backend.bankingsystem.dto.BaseDTO;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;

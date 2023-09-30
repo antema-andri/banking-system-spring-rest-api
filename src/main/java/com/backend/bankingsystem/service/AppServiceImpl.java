@@ -5,11 +5,12 @@ import com.backend.bankingsystem.dto.CustomerDTO;
 import com.backend.bankingsystem.exceptions.BalanceNotSufficientException;
 import com.backend.bankingsystem.exceptions.BankAccountNotFoundException;
 import com.backend.bankingsystem.exceptions.CustomerNotFoundException;
+import com.backend.bankingsystem.utils.UtilFileReader;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Service
 @AllArgsConstructor
@@ -18,12 +19,15 @@ public class AppServiceImpl implements AppService{
 
     @Override
     public void loadData() {
-        Stream.of("custom1", "custom2", "custom3").forEach(name->{
-            CustomerDTO customerDTO=new CustomerDTO();
-            customerDTO.setName(name);
-            customerDTO.setEmail(name+"@gmail.com");
-            bankAccountService.saveCustomer(customerDTO);
-        });
+        /* create customers */
+        List<CustomerDTO> customerDTOList;
+        try {
+            customerDTOList=UtilFileReader.readJsonArray("static/jsondata/customers.json",CustomerDTO.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        customerDTOList.forEach(customerDTO->bankAccountService.saveCustomer(customerDTO));
+
         /* create accounts */
         List<CustomerDTO> customerList=bankAccountService.listCustomers();
         for (CustomerDTO customerDTO:customerList){
@@ -34,6 +38,7 @@ public class AppServiceImpl implements AppService{
                 e.printStackTrace();
             }
         }
+
         /* create operations */
         List<BankAccountDTO> bankAccountList=bankAccountService.listBankAccount();
         for(BankAccountDTO bankAccountDTO:bankAccountList){

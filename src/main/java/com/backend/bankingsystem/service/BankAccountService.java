@@ -7,13 +7,12 @@ import com.backend.bankingsystem.dto.SavingAccountDTO;
 import com.backend.bankingsystem.exceptions.BalanceNotSufficientException;
 import com.backend.bankingsystem.exceptions.BankAccountNotFoundException;
 import com.backend.bankingsystem.exceptions.CustomerNotFoundException;
-import com.backend.bankingsystem.model.BankAccount;
-import com.backend.bankingsystem.model.Customer;
 
 import java.util.List;
 
 public interface BankAccountService {
     CustomerDTO saveCustomer(CustomerDTO customerDTO);
+    CustomerDTO getCustomer(Long customerId);
     CurrentAccountDTO createCurrentAccount(double balance, Long customerId, double overDraft) throws CustomerNotFoundException;
     SavingAccountDTO createSavingAccount(double balance, Long customerId, double interestRate) throws CustomerNotFoundException;
     List<CustomerDTO> listCustomers();

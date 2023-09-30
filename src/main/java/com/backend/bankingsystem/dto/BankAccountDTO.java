@@ -1,14 +1,17 @@
 package com.backend.bankingsystem.dto;
 
-import lombok.AllArgsConstructor;
+import com.backend.bankingsystem.enums.AccountStatus;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
-@Data @AllArgsConstructor @NoArgsConstructor
+@Data
 public class BankAccountDTO {
     private String id;
     private double balance;
     private Date createdAt;
+    private AccountStatus status;
+    private String currency;
+    private CustomerDTO customer;
+    private String type;
 }

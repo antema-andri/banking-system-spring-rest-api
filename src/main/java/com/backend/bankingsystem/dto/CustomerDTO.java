@@ -1,12 +1,14 @@
 package com.backend.bankingsystem.dto;
 
-import lombok.AllArgsConstructor;
+import com.backend.bankingsystem.model.BankAccount;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data @AllArgsConstructor @NoArgsConstructor
+import java.util.List;
+
+@Data
 public class CustomerDTO{
     private Long id;
     private String name;
     private String email;
+    private List<BankAccountDTO> bankAccounts;
 }
