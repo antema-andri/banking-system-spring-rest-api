@@ -16,4 +16,6 @@ public class Customer {
     private String email;
     @OneToMany(mappedBy = "customer")
     private List<BankAccount> bankAccounts;
+    @OneToOne(mappedBy = "customer", optional = true)
+    private AppUser appUser;
 }

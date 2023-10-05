@@ -1,6 +1,5 @@
 package com.backend.bankingsystem.dto;
 
-import com.backend.bankingsystem.model.BankAccount;
 import lombok.Data;
 
 import java.util.List;

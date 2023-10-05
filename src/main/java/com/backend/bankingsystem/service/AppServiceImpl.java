@@ -1,12 +1,20 @@
 package com.backend.bankingsystem.service;
 
+import com.backend.bankingsystem.dao.AppRoleRepository;
+import com.backend.bankingsystem.dao.AppUserRepository;
 import com.backend.bankingsystem.dto.BankAccountDTO;
 import com.backend.bankingsystem.dto.CustomerDTO;
+import com.backend.bankingsystem.enums.UserRole;
 import com.backend.bankingsystem.exceptions.BalanceNotSufficientException;
 import com.backend.bankingsystem.exceptions.BankAccountNotFoundException;
 import com.backend.bankingsystem.exceptions.CustomerNotFoundException;
+import com.backend.bankingsystem.mapper.EntityMapper;
+import com.backend.bankingsystem.model.AppRole;
+import com.backend.bankingsystem.model.AppUser;
+import com.backend.bankingsystem.model.Customer;
 import com.backend.bankingsystem.utils.UtilFileReader;
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -15,7 +23,11 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class AppServiceImpl implements AppService{
-    public final BankAccountService bankAccountService;
+    private final BankAccountService bankAccountService;
+    private final AppRoleRepository appRoleRepository;
+    private final AppUserRepository appUserRepository;
+    private final EntityMapper entityMapper;
+
 
     @Override
     public void loadData() {
@@ -44,14 +56,46 @@ public class AppServiceImpl implements AppService{
         for(BankAccountDTO bankAccountDTO:bankAccountList){
             for(int i=0; i<10; i++){
                 try {
-                    double creditAmount=1000+Math.random()*900000;
-                    double debitAmount=500+Math.random()*100000;
+                    double creditAmount=10000+Math.random()*900000;
+                    double debitAmount=10+Math.random()*100000;
                     bankAccountService.credit(bankAccountDTO.getId(), creditAmount, "Credit "+creditAmount);
                     bankAccountService.debit(bankAccountDTO.getId(), debitAmount, "Debit "+debitAmount);
                 } catch (BankAccountNotFoundException | BalanceNotSufficientException e) {
                     e.printStackTrace();
                 }
             }
+        }
+
+        /* create Users */
+        this.loadAppUsers();
+    }
+
+    public void loadAppUsers(){
+        Customer customer=entityMapper.fromDTO(bankAccountService.getCustomer(1L));
+        this.loadRoles();
+        List<AppUser> appUsers;
+        int userNumber=2;
+        try {
+            appUsers=UtilFileReader.readJsonArray("static/jsondata/users_test.json",AppUser.class);
+            int count=0;
+            for (AppUser user:appUsers){
+                BCryptPasswordEncoder bCryptPasswordEncoder=new BCryptPasswordEncoder();
+                user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+                user.setRoles(appRoleRepository.findAll());
+                if(count==0) user.setCustomer(customer);
+                appUserRepository.save(user);
+                count++;
+                if(count==userNumber) break;
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    void loadRoles() {
+        for (UserRole userRole : UserRole.values()) {
+            AppRole appRole=new AppRole(null, userRole.toString());
+            appRoleRepository.save(appRole);
         }
     }
 }
