@@ -1,7 +1,6 @@
 package com.backend.bankingsystem.config;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

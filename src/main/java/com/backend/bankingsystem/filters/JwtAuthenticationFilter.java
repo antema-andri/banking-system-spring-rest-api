@@ -1,20 +1,19 @@
 package com.backend.bankingsystem.filters;
 
-import java.io.IOException;
-
 import com.backend.bankingsystem.dto.AuthenticationDTO;
 import com.backend.bankingsystem.service.TokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	private AuthenticationManager authenticationManager;
@@ -30,7 +29,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException {
 		try {
-			AuthenticationDTO authenticationDTO = new ObjectMapper().readValue(request.getInputStream(), AuthenticationDTO.class);
+			AuthenticationDTO authenticationDTO=new ObjectMapper().readValue(request.getInputStream(), AuthenticationDTO.class);
 			String username= authenticationDTO.getUsername();
 			String password= authenticationDTO.getPassword();
 			UsernamePasswordAuthenticationToken u=new UsernamePasswordAuthenticationToken(username,password);

@@ -3,6 +3,7 @@ package com.backend.bankingsystem.config;
 import com.backend.bankingsystem.service.TokenService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -32,8 +33,10 @@ public class SecurityConfiguration {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf->csrf.disable())
+                .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.OPTIONS),AntPathRequestMatcher.antMatcher("/**")).permitAll()
                         .requestMatchers(
                                 AntPathRequestMatcher.antMatcher("/api/auth/token"),
                                 AntPathRequestMatcher.antMatcher("/h2-console/**"),
@@ -62,9 +65,9 @@ public class SecurityConfiguration {
         corsConfiguration.addAllowedOrigin("*");
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.addAllowedHeader("*");
+        corsConfiguration.addExposedHeader("*");
         UrlBasedCorsConfigurationSource source=new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration);
         return source;
     }
-
 }
