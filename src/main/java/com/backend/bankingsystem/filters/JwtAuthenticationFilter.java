@@ -1,7 +1,10 @@
 package com.backend.bankingsystem.filters;
 
+import com.backend.bankingsystem.dto.AppUserDTO;
 import com.backend.bankingsystem.dto.AuthenticationDTO;
+import com.backend.bankingsystem.service.AppUserService;
 import com.backend.bankingsystem.service.TokenService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -11,18 +14,31 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	private AuthenticationManager authenticationManager;
 	private TokenService tokenService;
+	private AppUserService appUserService;
 	
-	public JwtAuthenticationFilter(AuthenticationManager authenticationManager, TokenService tokenService) {
-		this.authenticationManager=authenticationManager;
+	public JwtAuthenticationFilter(
+			AuthenticationManager authenticationManager,
+			TokenService tokenService,
+			AppUserService appUserService
+	) {
 		setFilterProcessesUrl("/api/auth/token");
+		this.authenticationManager=authenticationManager;
 		this.tokenService=tokenService;
+		this.appUserService=appUserService;
 	}
 	
 	@Override
@@ -43,6 +59,32 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication authResult) throws IOException, ServletException {
 		String jwtAccessToken=tokenService.generateToken(authResult);
+		String responseBody=buildResponseBody(authResult);
+
+		response.setContentType("application/json");
+		response.getWriter().write(responseBody);
 		response.setHeader("Authorization", jwtAccessToken);
+	}
+
+	public String buildResponseBody(Authentication authResult) {
+		UserDetails userDetails = (UserDetails) authResult.getPrincipal();
+		AppUserDTO appUserDTO = appUserService.getCurrentUser(userDetails.getUsername());
+		ObjectMapper objectMapper = new ObjectMapper();
+
+		try {
+			String userJson = objectMapper.writeValueAsString(appUserDTO);
+			Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
+			List<String> authorityStrings = authorities.stream()
+					.map(GrantedAuthority::getAuthority)
+					.collect(Collectors.toList());
+
+			Map<String, Object> responseMap = new HashMap<>();
+			responseMap.put("user", userJson);
+			responseMap.put("authorities", authorityStrings);
+
+			return objectMapper.writeValueAsString(responseMap);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

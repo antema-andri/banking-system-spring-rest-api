@@ -1,9 +1,9 @@
 package com.backend.bankingsystem.config;
 
+import com.backend.bankingsystem.service.AppUserService;
 import com.backend.bankingsystem.service.TokenService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -23,10 +23,16 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfiguration {
     private TokenService tokenService;
     private UserDetailsService userDetailsService;
+    private AppUserService appUserService;
 
-    public SecurityConfiguration(TokenService tokenService, UserDetailsService userDetailsService){
+    public SecurityConfiguration(
+            TokenService tokenService,
+            UserDetailsService userDetailsService,
+            AppUserService appUserService
+    ){
         this.tokenService=tokenService;
         this.userDetailsService=userDetailsService;
+        this.appUserService=appUserService;
     }
 
     @Bean
@@ -36,7 +42,6 @@ public class SecurityConfiguration {
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.OPTIONS),AntPathRequestMatcher.antMatcher("/**")).permitAll()
                         .requestMatchers(
                                 AntPathRequestMatcher.antMatcher("/api/auth/token"),
                                 AntPathRequestMatcher.antMatcher("/h2-console/**"),
@@ -45,9 +50,16 @@ public class SecurityConfiguration {
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()))
-                .apply(new SecurCustomDsl(tokenService));
+                .apply(this.initCustomDsl());
         http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
         return http.build();
+    }
+
+    public SecurCustomDsl initCustomDsl(){
+        SecurCustomDsl securCustomDsl=new SecurCustomDsl();
+        securCustomDsl.setTokenService(this.tokenService);
+        securCustomDsl.setAppUserService(this.appUserService);
+        return securCustomDsl;
     }
 
     @Bean

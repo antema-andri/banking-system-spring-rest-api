@@ -1,13 +1,7 @@
 package com.backend.bankingsystem.mapper;
 
-import com.backend.bankingsystem.dto.BankAccountDTO;
-import com.backend.bankingsystem.dto.CurrentAccountDTO;
-import com.backend.bankingsystem.dto.CustomerDTO;
-import com.backend.bankingsystem.dto.SavingAccountDTO;
-import com.backend.bankingsystem.model.BankAccount;
-import com.backend.bankingsystem.model.CurrentAccount;
-import com.backend.bankingsystem.model.Customer;
-import com.backend.bankingsystem.model.SavingAccount;
+import com.backend.bankingsystem.dto.*;
+import com.backend.bankingsystem.model.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -38,4 +32,7 @@ public interface EntityMapper {
     BankAccount fromDTO(BankAccountDTO bankAccountDTO);
     List<BankAccountDTO> bankAccountsToBankAccountDTOs(List<BankAccount> bankAccounts);
 
+    @Mapping(target = "password", ignore = true)
+    AppUserDTO fromEntity(AppUser appUser);
+    AppUser fromDTO(AppUserDTO appUserDTO);
 }
