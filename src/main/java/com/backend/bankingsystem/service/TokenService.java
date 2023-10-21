@@ -51,7 +51,6 @@ public class TokenService {
         boolean isValidSignature;
         SignedJWT signedJWT=SignedJWT.parse(token);
         String algoToken=signedJWT.getHeader().getAlgorithm().getName();
-        /*System.out.println("ALGO_TOKEN: "+algoToken);*/
         isValidSignature=algoToken.equals("HS512");
         return isValidSignature;
     }
