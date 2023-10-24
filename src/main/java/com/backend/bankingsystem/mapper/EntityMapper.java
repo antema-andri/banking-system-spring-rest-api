@@ -33,6 +33,7 @@ public interface EntityMapper {
     List<BankAccountDTO> bankAccountsToBankAccountDTOs(List<BankAccount> bankAccounts);
 
     @Mapping(target = "password", ignore = true)
+    @Mapping(source = "customer", target = "customer")
     AppUserDTO fromEntity(AppUser appUser);
     AppUser fromDTO(AppUserDTO appUserDTO);
 }

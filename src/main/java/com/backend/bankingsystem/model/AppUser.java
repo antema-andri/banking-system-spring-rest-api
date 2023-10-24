@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Entity
 @Data @NoArgsConstructor @AllArgsConstructor
 public class AppUser {
@@ -18,6 +16,6 @@ public class AppUser {
     @OneToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
-    @ManyToMany(fetch = FetchType.EAGER)
-    private List<AppRole> roles;
+    @ManyToOne
+    private AppRole appRole;
 }

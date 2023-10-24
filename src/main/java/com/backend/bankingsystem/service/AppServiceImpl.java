@@ -81,8 +81,13 @@ public class AppServiceImpl implements AppService{
             for (AppUser user:appUsers){
                 BCryptPasswordEncoder bCryptPasswordEncoder=new BCryptPasswordEncoder();
                 user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-                user.setRoles(appRoleRepository.findAll());
-                if(count==0) user.setCustomer(customer);
+                /*user.setRoles(appRoleRepository.findAll());*/
+                if(count==0) {
+                    user.setAppRole(appRoleRepository.findById(1L).orElseThrow());
+                }else{
+                    user.setCustomer(customer);
+                    user.setAppRole(appRoleRepository.findById(2L).orElseThrow());
+                }
                 appUserRepository.save(user);
                 count++;
                 if(count==userNumber) break;
@@ -94,7 +99,8 @@ public class AppServiceImpl implements AppService{
 
     void loadRoles() {
         for (UserRole userRole : UserRole.values()) {
-            AppRole appRole=new AppRole(null, userRole.toString());
+            AppRole appRole=new AppRole();
+            appRole.setRoleName(userRole.toString());
             appRoleRepository.save(appRole);
         }
     }

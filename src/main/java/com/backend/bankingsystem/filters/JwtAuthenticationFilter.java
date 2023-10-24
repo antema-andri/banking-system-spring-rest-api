@@ -73,14 +73,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
 		try {
 			String userJson = objectMapper.writeValueAsString(appUserDTO);
-			Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-			List<String> authorityStrings = authorities.stream()
-					.map(GrantedAuthority::getAuthority)
-					.collect(Collectors.toList());
-
 			Map<String, Object> responseMap = new HashMap<>();
 			responseMap.put("user", userJson);
-			responseMap.put("authorities", authorityStrings);
 
 			return objectMapper.writeValueAsString(responseMap);
 		} catch (JsonProcessingException e) {
