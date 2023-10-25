@@ -81,7 +81,6 @@ public class AppServiceImpl implements AppService{
             for (AppUser user:appUsers){
                 BCryptPasswordEncoder bCryptPasswordEncoder=new BCryptPasswordEncoder();
                 user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-                /*user.setRoles(appRoleRepository.findAll());*/
                 if(count==0) {
                     user.setAppRole(appRoleRepository.findById(1L).orElseThrow());
                 }else{
