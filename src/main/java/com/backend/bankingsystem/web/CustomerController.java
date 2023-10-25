@@ -27,7 +27,7 @@ public class CustomerController {
     }
 
     @PutMapping("customers/{id}")
-    public CustomerDTO updateCustomer(@PathVariable Long customerId, CustomerDTO customerDTO){
+    public CustomerDTO updateCustomer(@PathVariable Long customerId, @RequestBody CustomerDTO customerDTO){
         customerDTO.setId(customerId);
         return bankAccountService.updateCustomer(customerDTO);
     }
