@@ -26,6 +26,18 @@ public class CustomerController {
         return bankAccountService.saveCustomer(customerDTO);
     }
 
+    @PutMapping("customers/{id}")
+    public CustomerDTO updateCustomer(@PathVariable Long customerId, CustomerDTO customerDTO){
+        customerDTO.setId(customerId);
+        return bankAccountService.updateCustomer(customerDTO);
+    }
+
+    @DeleteMapping("customers/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public void deleteCustomer(@PathVariable Long customerId){
+        bankAccountService.deleteCustomer(customerId);
+    }
+
     @GetMapping("customers")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public List<CustomerDTO> customerList(){
