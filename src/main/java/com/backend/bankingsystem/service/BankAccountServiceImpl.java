@@ -157,4 +157,10 @@ public class BankAccountServiceImpl implements BankAccountService{
         List<BankAccount> bankAccounts=bankAccountRepository.findAll();
         return bankAccounts.stream().map(ba->entityMapper.fromEntity(ba)).collect(Collectors.toList());
     }
+
+    @Override
+    public List<CustomerDTO> searchCustomers(String world) {
+        List<Customer> customers=customerRepository.findByNameContainingIgnoreCase(world);
+        return customers.stream().map(customer->entityMapper.fromEntity(customer)).collect(Collectors.toList());
+    }
 }

@@ -43,4 +43,10 @@ public class CustomerController {
     public List<CustomerDTO> customerList(){
         return bankAccountService.listCustomers();
     }
+
+    @GetMapping("customers/search")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public List<CustomerDTO> searchCustomers(@RequestParam(name="world", defaultValue = "") String world){
+        return bankAccountService.searchCustomers(world);
+    }
 }

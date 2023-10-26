@@ -23,4 +23,6 @@ public interface BankAccountService {
     void credit(String bankAccountId, double amount, String desc) throws BankAccountNotFoundException;
     void localTransfer(String accountSourceId, String accountDestinationId, double amount) throws BankAccountNotFoundException, BalanceNotSufficientException;
     List<BankAccountDTO> listBankAccount();
+
+    List<CustomerDTO> searchCustomers(String world);
 }
