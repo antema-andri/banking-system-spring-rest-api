@@ -34,7 +34,7 @@ public class CustomerController {
 
     @DeleteMapping("customers/{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public void deleteCustomer(@PathVariable Long customerId){
+    public void deleteCustomer(@PathVariable(name = "id") Long customerId){
         bankAccountService.deleteCustomer(customerId);
     }
 

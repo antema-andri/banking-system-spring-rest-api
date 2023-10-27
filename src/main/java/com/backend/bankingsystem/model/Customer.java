@@ -14,7 +14,7 @@ public class Customer {
     private Long id;
     private String name;
     private String email;
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<BankAccount> bankAccounts;
     @OneToOne(mappedBy = "customer", optional = true)
     private AppUser appUser;
