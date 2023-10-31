@@ -36,4 +36,8 @@ public interface EntityMapper {
     @Mapping(source = "customer", target = "customer")
     AppUserDTO fromEntity(AppUser appUser);
     AppUser fromDTO(AppUserDTO appUserDTO);
+
+    @Mapping(source = "bankAccount", target = "bankAccount")
+    AccountOperationDTO fromEntity(AccountOperation accountOperation);
+    AccountOperation fromDTO(AccountOperationDTO accountOperationDTO);
 }

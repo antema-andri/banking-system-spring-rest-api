@@ -1,12 +1,10 @@
 package com.backend.bankingsystem.service;
 
-import com.backend.bankingsystem.dto.BankAccountDTO;
-import com.backend.bankingsystem.dto.CurrentAccountDTO;
-import com.backend.bankingsystem.dto.CustomerDTO;
-import com.backend.bankingsystem.dto.SavingAccountDTO;
+import com.backend.bankingsystem.dto.*;
 import com.backend.bankingsystem.exceptions.BalanceNotSufficientException;
 import com.backend.bankingsystem.exceptions.BankAccountNotFoundException;
 import com.backend.bankingsystem.exceptions.CustomerNotFoundException;
+import com.backend.bankingsystem.model.AccountOperation;
 
 import java.util.List;
 
@@ -25,4 +23,8 @@ public interface BankAccountService {
     List<BankAccountDTO> listBankAccount();
 
     List<CustomerDTO> searchCustomers(String world);
+
+    List<AccountOperationDTO> accountHistory(String accountId);
+
+    AccountHistoryDTO accountHistoryPage(String accountId, int page, int size) throws BankAccountNotFoundException;
 }
