@@ -55,4 +55,13 @@ public class BankAccountController {
     public void transfer(@RequestBody TransferDTO transferDTO) throws BankAccountNotFoundException, BalanceNotSufficientException {
         bankAccountService.localTransfer(transferDTO.getAccountSourceId(), transferDTO.getAccountDestinationId(), transferDTO.getAmount());
     }
+
+    @GetMapping("accounts/page")
+    public BankAccountPageDTO getBankAccountPage(
+            @RequestParam(name = "name") String customerName,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "5") int size
+    ){
+        return bankAccountService.getBankAccountPage(customerName,page,size);
+    }
 }

@@ -38,7 +38,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter{
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
-		}else if(request.getRequestURI().equals("/api/auth/token") || request.getRequestURI().startsWith("/h2-console")){
+		}else if(request.getRequestURI().equals("/api/auth/token") || request.getRequestURI().startsWith("/h2-console") || request.getRequestURI().startsWith("/health")){
 			filterChain.doFilter(request, response);
 		}else {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

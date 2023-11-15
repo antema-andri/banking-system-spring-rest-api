@@ -5,9 +5,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class HomeController {
+    private int counter;
 
     @GetMapping("/health")
     public String test(){
-        return "data test";
+        counter++;
+        return "data test "+counter;
     }
 }

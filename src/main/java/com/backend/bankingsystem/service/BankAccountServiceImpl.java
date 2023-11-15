@@ -7,6 +7,7 @@ import com.backend.bankingsystem.dto.*;
 import com.backend.bankingsystem.enums.AccountStatus;
 import com.backend.bankingsystem.enums.Currency;
 import com.backend.bankingsystem.enums.OperationType;
+import com.backend.bankingsystem.exceptions.BadAmountException;
 import com.backend.bankingsystem.exceptions.BalanceNotSufficientException;
 import com.backend.bankingsystem.exceptions.BankAccountNotFoundException;
 import com.backend.bankingsystem.exceptions.CustomerNotFoundException;
@@ -14,6 +15,7 @@ import com.backend.bankingsystem.mapper.EntityMapper;
 import com.backend.bankingsystem.model.*;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -114,8 +116,10 @@ public class BankAccountServiceImpl implements BankAccountService{
     }
 
     @Override
-    public void debit(String bankAccountId, double amount, String desc) throws BankAccountNotFoundException, BalanceNotSufficientException {
+    public void debit(String bankAccountId, double amount, String desc) throws BankAccountNotFoundException, BalanceNotSufficientException, BadAmountException {
         BankAccount bankAccount=findBankAccount(bankAccountId);
+        if(amount<=0)
+            throw new BadAmountException("Negative or null amount");
         if(bankAccount.getBalance()<amount)
             throw new BalanceNotSufficientException("Balance not enough");
         AccountOperation accountOperation=new AccountOperation();
@@ -146,7 +150,7 @@ public class BankAccountServiceImpl implements BankAccountService{
     }
 
     @Override
-    public void localTransfer(String accountSourceId, String accountDestinationId, double amount) throws BankAccountNotFoundException, BalanceNotSufficientException {
+    public void localTransfer(String accountSourceId, String accountDestinationId, double amount) throws BankAccountNotFoundException, BalanceNotSufficientException, BadAmountException {
         debit(accountSourceId, amount, "Transfer to "+accountDestinationId);
         credit(accountDestinationId, amount, "Transfer from "+accountSourceId);
     }
@@ -183,5 +187,17 @@ public class BankAccountServiceImpl implements BankAccountService{
         accountHistoryDTO.setPageSize(size);
         accountHistoryDTO.setTotalPages(accountOperations.getTotalPages());
         return accountHistoryDTO;
+    }
+
+    @Override
+    public BankAccountPageDTO getBankAccountPage(String customerName, int page, int size){
+        Page<BankAccount> bankAccounts=bankAccountRepository.findByCustomerNameContainingIgnoreCase(customerName, PageRequest.of(page,size));
+        List<BankAccountDTO> bankAccountDTOS=bankAccounts.getContent().stream().map(ba->entityMapper.fromEntity(ba)).collect(Collectors.toList());
+        BankAccountPageDTO bankAccountPageDTO=new BankAccountPageDTO();
+        bankAccountPageDTO.setCurrentPage(page);
+        bankAccountPageDTO.setTotalPages(bankAccounts.getTotalPages());
+        bankAccountPageDTO.setPageSize(size);
+        bankAccountPageDTO.setAccounts(bankAccountDTOS);
+        return bankAccountPageDTO;
     }
 }
