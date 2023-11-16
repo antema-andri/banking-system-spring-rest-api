@@ -5,6 +5,7 @@ import com.backend.bankingsystem.dao.AppUserRepository;
 import com.backend.bankingsystem.dto.BankAccountDTO;
 import com.backend.bankingsystem.dto.CustomerDTO;
 import com.backend.bankingsystem.enums.UserRole;
+import com.backend.bankingsystem.exceptions.BadAmountException;
 import com.backend.bankingsystem.exceptions.BalanceNotSufficientException;
 import com.backend.bankingsystem.exceptions.BankAccountNotFoundException;
 import com.backend.bankingsystem.exceptions.CustomerNotFoundException;
@@ -60,7 +61,7 @@ public class AppServiceImpl implements AppService{
                     double debitAmount=10+Math.random()*100000;
                     bankAccountService.credit(bankAccountDTO.getId(), creditAmount, "Credit "+creditAmount);
                     bankAccountService.debit(bankAccountDTO.getId(), debitAmount, "Debit "+debitAmount);
-                } catch (BankAccountNotFoundException | BalanceNotSufficientException e) {
+                } catch (BankAccountNotFoundException | BalanceNotSufficientException | BadAmountException e) {
                     e.printStackTrace();
                 }
             }

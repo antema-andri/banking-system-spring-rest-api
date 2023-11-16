@@ -1,6 +1,7 @@
 package com.backend.bankingsystem.web;
 
 import com.backend.bankingsystem.dto.*;
+import com.backend.bankingsystem.exceptions.BadAmountException;
 import com.backend.bankingsystem.exceptions.BalanceNotSufficientException;
 import com.backend.bankingsystem.exceptions.BankAccountNotFoundException;
 import com.backend.bankingsystem.service.BankAccountService;
@@ -47,12 +48,12 @@ public class BankAccountController {
     }
 
     @PostMapping("accounts/debit")
-    public void debit(@RequestBody DebitDTO debitDTO) throws BankAccountNotFoundException, BalanceNotSufficientException {
+    public void debit(@RequestBody DebitDTO debitDTO) throws BankAccountNotFoundException, BalanceNotSufficientException, BadAmountException {
         bankAccountService.debit(debitDTO.getAccountId(), debitDTO.getAmount(), debitDTO.getDesc());
     }
 
     @PostMapping("accounts/transfer")
-    public void transfer(@RequestBody TransferDTO transferDTO) throws BankAccountNotFoundException, BalanceNotSufficientException {
+    public void transfer(@RequestBody TransferDTO transferDTO) throws BankAccountNotFoundException, BalanceNotSufficientException, BadAmountException {
         bankAccountService.localTransfer(transferDTO.getAccountSourceId(), transferDTO.getAccountDestinationId(), transferDTO.getAmount());
     }
 
