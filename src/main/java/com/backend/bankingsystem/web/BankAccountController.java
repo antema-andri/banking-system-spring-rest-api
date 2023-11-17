@@ -43,13 +43,13 @@ public class BankAccountController {
     }
 
     @PostMapping("accounts/credit")
-    public void credit(@RequestBody  CreditDTO creditDTO) throws BankAccountNotFoundException {
-        bankAccountService.credit(creditDTO.getAccountId(), creditDTO.getAmount(), creditDTO.getDesc());
+    public BankAccountDTO credit(@RequestBody  CreditDTO creditDTO) throws BankAccountNotFoundException {
+        return bankAccountService.credit(creditDTO.getAccountId(), creditDTO.getAmount(), creditDTO.getDesc());
     }
 
     @PostMapping("accounts/debit")
-    public void debit(@RequestBody DebitDTO debitDTO) throws BankAccountNotFoundException, BalanceNotSufficientException, BadAmountException {
-        bankAccountService.debit(debitDTO.getAccountId(), debitDTO.getAmount(), debitDTO.getDesc());
+    public BankAccountDTO debit(@RequestBody DebitDTO debitDTO) throws BankAccountNotFoundException, BalanceNotSufficientException, BadAmountException {
+        return bankAccountService.debit(debitDTO.getAccountId(), debitDTO.getAmount(), debitDTO.getDesc());
     }
 
     @PostMapping("accounts/transfer")

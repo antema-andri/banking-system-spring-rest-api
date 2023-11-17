@@ -15,7 +15,6 @@ import com.backend.bankingsystem.mapper.EntityMapper;
 import com.backend.bankingsystem.model.*;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -116,7 +115,7 @@ public class BankAccountServiceImpl implements BankAccountService{
     }
 
     @Override
-    public void debit(String bankAccountId, double amount, String desc) throws BankAccountNotFoundException, BalanceNotSufficientException, BadAmountException {
+    public BankAccountDTO debit(String bankAccountId, double amount, String desc) throws BankAccountNotFoundException, BalanceNotSufficientException, BadAmountException {
         BankAccount bankAccount=findBankAccount(bankAccountId);
         if(amount<=0)
             throw new BadAmountException("Negative or null amount");
@@ -131,11 +130,11 @@ public class BankAccountServiceImpl implements BankAccountService{
         accountOperationRepository.save(accountOperation);
         /* Update balance */
         bankAccount.setBalance(bankAccount.getBalance()-amount);
-        bankAccountRepository.save(bankAccount);
+        return entityMapper.fromEntity(bankAccountRepository.save(bankAccount));
     }
 
     @Override
-    public void credit(String bankAccountId, double amount, String desc) throws BankAccountNotFoundException {
+    public BankAccountDTO credit(String bankAccountId, double amount, String desc) throws BankAccountNotFoundException {
         BankAccount bankAccount=findBankAccount(bankAccountId);
         AccountOperation accountOperation=new AccountOperation();
         accountOperation.setBankAccount(bankAccount);
@@ -146,7 +145,7 @@ public class BankAccountServiceImpl implements BankAccountService{
         accountOperationRepository.save(accountOperation);
         /* Update balance */
         bankAccount.setBalance(bankAccount.getBalance()+amount);
-        bankAccountRepository.save(bankAccount);
+        return entityMapper.fromEntity(bankAccountRepository.save(bankAccount));
     }
 
     @Override
