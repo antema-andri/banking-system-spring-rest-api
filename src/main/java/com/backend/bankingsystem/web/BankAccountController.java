@@ -4,6 +4,7 @@ import com.backend.bankingsystem.dto.*;
 import com.backend.bankingsystem.exceptions.BadAmountException;
 import com.backend.bankingsystem.exceptions.BalanceNotSufficientException;
 import com.backend.bankingsystem.exceptions.BankAccountNotFoundException;
+import com.backend.bankingsystem.exceptions.SameAccountException;
 import com.backend.bankingsystem.service.BankAccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -53,8 +54,8 @@ public class BankAccountController {
     }
 
     @PostMapping("accounts/transfer")
-    public void transfer(@RequestBody TransferDTO transferDTO) throws BankAccountNotFoundException, BalanceNotSufficientException, BadAmountException {
-        bankAccountService.localTransfer(transferDTO.getAccountSourceId(), transferDTO.getAccountDestinationId(), transferDTO.getAmount());
+    public BankAccountDTO transfer(@RequestBody TransferDTO transferDTO) throws BankAccountNotFoundException, BalanceNotSufficientException, BadAmountException, SameAccountException {
+        return bankAccountService.localTransfer(transferDTO.getAccountSourceId(), transferDTO.getAccountDestinationId(), transferDTO.getAmount());
     }
 
     @GetMapping("accounts/page")

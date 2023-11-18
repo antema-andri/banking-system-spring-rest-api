@@ -7,10 +7,7 @@ import com.backend.bankingsystem.dto.*;
 import com.backend.bankingsystem.enums.AccountStatus;
 import com.backend.bankingsystem.enums.Currency;
 import com.backend.bankingsystem.enums.OperationType;
-import com.backend.bankingsystem.exceptions.BadAmountException;
-import com.backend.bankingsystem.exceptions.BalanceNotSufficientException;
-import com.backend.bankingsystem.exceptions.BankAccountNotFoundException;
-import com.backend.bankingsystem.exceptions.CustomerNotFoundException;
+import com.backend.bankingsystem.exceptions.*;
 import com.backend.bankingsystem.mapper.EntityMapper;
 import com.backend.bankingsystem.model.*;
 import lombok.AllArgsConstructor;
@@ -149,9 +146,12 @@ public class BankAccountServiceImpl implements BankAccountService{
     }
 
     @Override
-    public void localTransfer(String accountSourceId, String accountDestinationId, double amount) throws BankAccountNotFoundException, BalanceNotSufficientException, BadAmountException {
-        debit(accountSourceId, amount, "Transfer to "+accountDestinationId);
+    public BankAccountDTO localTransfer(String accountSourceId, String accountDestinationId, double amount) throws BankAccountNotFoundException, BalanceNotSufficientException, BadAmountException, SameAccountException {
+        if(accountSourceId.equals(accountDestinationId))
+            throw new SameAccountException("Same sender and receiver account");
+        BankAccountDTO debtorAccount=debit(accountSourceId, amount, "Transfer to "+accountDestinationId);
         credit(accountDestinationId, amount, "Transfer from "+accountSourceId);
+        return debtorAccount;
     }
 
     @Override
