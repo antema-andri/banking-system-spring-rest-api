@@ -64,7 +64,7 @@ public class BankAccountServiceImpl implements BankAccountService{
         currentAccount.setBalance(balance);
         currentAccount.setCreatedAt(new Date());
         currentAccount.setStatus(AccountStatus.CREATED);
-        currentAccount.setCurrency(Currency.EURO.toString());
+        currentAccount.setCurrency(Currency.DOLLAR.toString());
         currentAccount.setCustomer(customer);
         currentAccount.setOverDraft(overDraft);
         CurrentAccountDTO currentAccountDTO=(CurrentAccountDTO) entityMapper.fromEntity(bankAccountRepository.save(currentAccount));
@@ -80,7 +80,7 @@ public class BankAccountServiceImpl implements BankAccountService{
         savingAccount.setBalance(balance);
         savingAccount.setCreatedAt(new Date());
         savingAccount.setStatus(AccountStatus.CREATED);
-        savingAccount.setCurrency(Currency.EURO.toString());
+        savingAccount.setCurrency(Currency.DOLLAR.toString());
         savingAccount.setCustomer(customer);
         savingAccount.setInterestRate(interestRate);
         SavingAccountDTO savingAccountDTO=(SavingAccountDTO) entityMapper.fromEntity(bankAccountRepository.save(savingAccount));
