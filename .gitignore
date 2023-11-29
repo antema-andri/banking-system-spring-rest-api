@@ -1,6 +1,6 @@
-h2_db_env.properties
 pg_db_env.properties
 pg_rds_db_env.properties
+h2_db_env.properties
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
