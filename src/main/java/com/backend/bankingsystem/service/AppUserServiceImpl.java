@@ -28,6 +28,9 @@ public class AppUserServiceImpl implements AppUserService{
     @Override
     public List<AppUserDTO> getAppUsers(){
         List<AppUser> appUsers=appUserRepository.findAll();
+        appUsers.forEach(user->{
+            System.out.println(entityMapper.fromEntity(user).getId());
+        });
         return appUsers.stream().map(appUser->entityMapper.fromEntity(appUser)).collect(Collectors.toList());
     }
 }
