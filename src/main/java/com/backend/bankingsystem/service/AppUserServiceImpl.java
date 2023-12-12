@@ -8,6 +8,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional
 @AllArgsConstructor
@@ -20,5 +23,11 @@ public class AppUserServiceImpl implements AppUserService{
         AppUser appUser=appUserRepository.findByUsername(username);
         AppUserDTO appUserDTO=entityMapper.fromEntity(appUser);
         return appUserDTO;
+    }
+
+    @Override
+    public List<AppUserDTO> getAppUsers(){
+        List<AppUser> appUsers=appUserRepository.findAll();
+        return appUsers.stream().map(appUser->entityMapper.fromEntity(appUser)).collect(Collectors.toList());
     }
 }
