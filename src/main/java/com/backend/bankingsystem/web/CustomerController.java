@@ -49,4 +49,10 @@ public class CustomerController {
     public List<CustomerDTO> searchCustomers(@RequestParam(name="world", defaultValue = "") String world){
         return bankAccountService.searchCustomers(world);
     }
+
+    @GetMapping("customers/notuser")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public List<CustomerDTO> getCustomersNotUser(){
+        return bankAccountService.findCustomers();
+    }
 }

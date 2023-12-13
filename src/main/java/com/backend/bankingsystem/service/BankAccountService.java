@@ -13,6 +13,9 @@ public interface BankAccountService {
     CurrentAccountDTO createCurrentAccount(double balance, Long customerId, double overDraft) throws CustomerNotFoundException;
     SavingAccountDTO createSavingAccount(double balance, Long customerId, double interestRate) throws CustomerNotFoundException;
     List<CustomerDTO> listCustomers();
+
+    List<CustomerDTO> findCustomers();
+
     BankAccountDTO getBankAccount(String bankAccountId) throws BankAccountNotFoundException;
 
     BankAccountDTO debit(String bankAccountId, double amount, String desc) throws BankAccountNotFoundException, BalanceNotSufficientException, BadAmountException;

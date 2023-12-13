@@ -100,6 +100,12 @@ public class BankAccountServiceImpl implements BankAccountService{
         return customerDTOs;
     }
 
+    @Override
+    public List<CustomerDTO> findCustomers() {
+        List<Customer> customers=customerRepository.findByAppUserIsNull();
+        return customers.stream().map(c->entityMapper.fromEntity(c)).collect(Collectors.toList());
+    }
+
     BankAccount findBankAccount(String bankAccountId) throws BankAccountNotFoundException {
         return bankAccountRepository.findById(bankAccountId)
                 .orElseThrow(()->new BankAccountNotFoundException("BankAccount not found"));
