@@ -28,7 +28,6 @@ public class AppUserServiceImpl implements AppUserService{
     private final EntityMapper entityMapper;
     private final AppUserRepository appUserRepository;
     private final AppRoleRepository appRoleRepository;
-
     private final CustomerRepository customerRepository;
 
     @Override
@@ -72,7 +71,7 @@ public class AppUserServiceImpl implements AppUserService{
         appUser.setUsername(newUsername);
         appUser.setPassword(new BCryptPasswordEncoder().encode(password));
         appUser.setAppRole(appRole);
-
+        appUser.setCustomer(customerUser);
         return entityMapper.fromEntity(appUserRepository.save(appUser));
     }
 }
