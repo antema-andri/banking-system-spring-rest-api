@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -16,7 +17,8 @@ import java.util.List;
 public class BankAccount {
     @Id
     private String id;
-    private double balance;
+    @Column(precision=15, scale=2)
+    private BigDecimal balance;
     private Date createdAt;
     @Enumerated(EnumType.STRING)
     private AccountStatus status;

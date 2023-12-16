@@ -10,12 +10,14 @@ import com.backend.bankingsystem.enums.OperationType;
 import com.backend.bankingsystem.exceptions.*;
 import com.backend.bankingsystem.mapper.EntityMapper;
 import com.backend.bankingsystem.model.*;
+import com.backend.bankingsystem.utils.Format;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -61,7 +63,7 @@ public class BankAccountServiceImpl implements BankAccountService{
         if(customer==null) throw new CustomerNotFoundException("Customer not found");
         CurrentAccount currentAccount=new CurrentAccount();
         currentAccount.setId(UUID.randomUUID().toString());
-        currentAccount.setBalance(balance);
+        currentAccount.setBalance(BigDecimal.valueOf(balance));
         currentAccount.setCreatedAt(new Date());
         currentAccount.setStatus(AccountStatus.CREATED);
         currentAccount.setCurrency(Currency.DOLLAR.toString());
@@ -77,7 +79,7 @@ public class BankAccountServiceImpl implements BankAccountService{
         if(customer==null) throw new CustomerNotFoundException("Customer not found");
         SavingAccount savingAccount=new SavingAccount();
         savingAccount.setId(UUID.randomUUID().toString());
-        savingAccount.setBalance(balance);
+        savingAccount.setBalance(BigDecimal.valueOf(balance));
         savingAccount.setCreatedAt(new Date());
         savingAccount.setStatus(AccountStatus.CREATED);
         savingAccount.setCurrency(Currency.DOLLAR.toString());
@@ -122,17 +124,17 @@ public class BankAccountServiceImpl implements BankAccountService{
         BankAccount bankAccount=findBankAccount(bankAccountId);
         if(amount<=0)
             throw new BadAmountException("Negative or null amount");
-        if(bankAccount.getBalance()<amount)
+        if(bankAccount.getBalance().doubleValue()<amount)
             throw new BalanceNotSufficientException("Balance not enough");
         AccountOperation accountOperation=new AccountOperation();
         accountOperation.setBankAccount(bankAccount);
         accountOperation.setType(OperationType.DEBIT);
-        accountOperation.setAmount(amount);
+        accountOperation.setAmount(BigDecimal.valueOf(amount));
         accountOperation.setDate(new Date());
         accountOperation.setDescription(desc);
         accountOperationRepository.save(accountOperation);
         /* Update balance */
-        bankAccount.setBalance(bankAccount.getBalance()-amount);
+        bankAccount.setBalance(BigDecimal.valueOf(bankAccount.getBalance().doubleValue()-amount));
         return entityMapper.fromEntity(bankAccountRepository.save(bankAccount));
     }
 
@@ -142,12 +144,12 @@ public class BankAccountServiceImpl implements BankAccountService{
         AccountOperation accountOperation=new AccountOperation();
         accountOperation.setBankAccount(bankAccount);
         accountOperation.setType(OperationType.CREDIT);
-        accountOperation.setAmount(amount);
+        accountOperation.setAmount(BigDecimal.valueOf(amount));
         accountOperation.setDate(new Date());
         accountOperation.setDescription(desc);
         accountOperationRepository.save(accountOperation);
         /* Update balance */
-        bankAccount.setBalance(bankAccount.getBalance()+amount);
+        bankAccount.setBalance(BigDecimal.valueOf(bankAccount.getBalance().doubleValue()+amount));
         return entityMapper.fromEntity(bankAccountRepository.save(bankAccount));
     }
 
@@ -187,7 +189,7 @@ public class BankAccountServiceImpl implements BankAccountService{
         List<AccountOperationDTO> accountOperationDTOS=accountOperations.getContent().stream().map(accop->entityMapper.fromEntity(accop)).collect(Collectors.toList());
         accountHistoryDTO.setAccountOperations(accountOperationDTOS);
         accountHistoryDTO.setAccountId(bankAccount.getId());
-        accountHistoryDTO.setBalance(bankAccount.getBalance());
+        accountHistoryDTO.setBalance(bankAccount.getBalance().doubleValue());
         accountHistoryDTO.setCurrentPage(page);
         accountHistoryDTO.setPageSize(size);
         accountHistoryDTO.setTotalPages(accountOperations.getTotalPages());
