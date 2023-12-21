@@ -168,8 +168,8 @@ public class BankAccountServiceImpl implements BankAccountService{
     }
 
     @Override
-    public List<CustomerDTO> searchCustomers(String world) {
-        List<Customer> customers=customerRepository.findByNameContainingIgnoreCase(world);
+    public List<CustomerDTO> searchCustomers(String word) {
+        List<Customer> customers=customerRepository.findByNameContainingIgnoreCase(word);
         return customers.stream().map(customer->entityMapper.fromEntity(customer)).collect(Collectors.toList());
     }
 
