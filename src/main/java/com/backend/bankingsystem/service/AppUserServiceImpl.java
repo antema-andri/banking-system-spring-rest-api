@@ -50,9 +50,9 @@ public class AppUserServiceImpl implements AppUserService{
     }
 
     @Override
-    public AppUserDTO createAppUser(String newUsername, String password, String customerId, String appRoleId) throws ExistingUsernameException, CustomerNotFoundException, InvalidUserRoleException {
+    public AppUserDTO createAppUser(String newUsername, String password, String customerId, String roleName) throws ExistingUsernameException, CustomerNotFoundException, InvalidUserRoleException {
         AppUser appUser;
-        AppRole appRole=appRoleRepository.findById(Long.parseLong(appRoleId)).orElse(null);
+        AppRole appRole=appRoleRepository.findByRoleName(roleName);
         AppUser existingAppUser=appUserRepository.findByUsername(newUsername);
         Customer customerUser=null;
 

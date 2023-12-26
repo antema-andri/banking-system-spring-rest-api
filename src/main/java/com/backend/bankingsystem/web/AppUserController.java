@@ -34,6 +34,6 @@ public class AppUserController {
     @PostMapping("users")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public AppUserDTO createAppUser(@RequestBody InfoUserDTO infoUserDTO) throws InvalidUserRoleException, ExistingUsernameException, CustomerNotFoundException {
-        return appUserService.createAppUser(infoUserDTO.getUsername(),infoUserDTO.getPassword(),infoUserDTO.getCustomerId(),infoUserDTO.getRoleId());
+        return appUserService.createAppUser(infoUserDTO.getUsername(),infoUserDTO.getPassword(),infoUserDTO.getCustomerId(),infoUserDTO.getRoleName());
     }
 }

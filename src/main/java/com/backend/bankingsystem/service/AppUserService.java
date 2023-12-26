@@ -15,5 +15,5 @@ public interface AppUserService {
 
     List<AppRoleDTO> getRoles();
 
-    AppUserDTO createAppUser(String newUsername, String password, String customerId, String appRoleId) throws ExistingUsernameException, CustomerNotFoundException, InvalidUserRoleException;
+    AppUserDTO createAppUser(String newUsername, String password, String customerId, String roleName) throws ExistingUsernameException, CustomerNotFoundException, InvalidUserRoleException;
 }

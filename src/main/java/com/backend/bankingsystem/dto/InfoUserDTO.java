@@ -6,6 +6,6 @@ import lombok.Data;
 public class InfoUserDTO {
     private String username;
     private String password;
-    private String roleId;
+    private String roleName;
     private String customerId;
 }
