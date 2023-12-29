@@ -1,10 +1,7 @@
 package com.backend.bankingsystem.web;
 
 import com.backend.bankingsystem.dto.*;
-import com.backend.bankingsystem.exceptions.BadAmountException;
-import com.backend.bankingsystem.exceptions.BalanceNotSufficientException;
-import com.backend.bankingsystem.exceptions.BankAccountNotFoundException;
-import com.backend.bankingsystem.exceptions.SameAccountException;
+import com.backend.bankingsystem.exceptions.*;
 import com.backend.bankingsystem.service.BankAccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -65,5 +62,13 @@ public class BankAccountController {
             @RequestParam(name = "size", defaultValue = "5") int size
     ){
         return bankAccountService.getBankAccountPage(customerName,page,size);
+    }
+
+    @GetMapping("accounts/customer/{customerId}")
+    @PreAuthorize("hasAuthority('SCOPE_USER')")
+    public List<BankAccountDTO> customerBankAccounts(
+        @PathVariable(name = "customerId") String customerId
+    ) throws CustomerNotFoundException {
+        return bankAccountService.getCustomerAccounts(customerId);
     }
 }

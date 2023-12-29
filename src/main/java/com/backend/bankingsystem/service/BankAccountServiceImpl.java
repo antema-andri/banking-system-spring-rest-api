@@ -104,7 +104,7 @@ public class BankAccountServiceImpl implements BankAccountService{
     @Override
     public List<CustomerDTO> findCustomers() {
         List<Customer> customers=customerRepository.findByAppUserIsNull();
-        return customers.stream().map(c->entityMapper.fromEntity(c)).collect(Collectors.toList());
+        return customers.stream().map(entityMapper::fromEntity).collect(Collectors.toList());
     }
 
     BankAccount findBankAccount(String bankAccountId) throws BankAccountNotFoundException {
@@ -164,28 +164,28 @@ public class BankAccountServiceImpl implements BankAccountService{
     @Override
     public List<BankAccountDTO> listBankAccount(){
         List<BankAccount> bankAccounts=bankAccountRepository.findAll();
-        return bankAccounts.stream().map(ba->entityMapper.fromEntity(ba)).collect(Collectors.toList());
+        return bankAccounts.stream().map(entityMapper::fromEntity).collect(Collectors.toList());
     }
 
     @Override
     public List<CustomerDTO> searchCustomers(String word) {
         List<Customer> customers=customerRepository.findByNameContainingIgnoreCase(word);
-        return customers.stream().map(customer->entityMapper.fromEntity(customer)).collect(Collectors.toList());
+        return customers.stream().map(entityMapper::fromEntity).collect(Collectors.toList());
     }
 
     @Override
     public List<AccountOperationDTO> accountHistory(String accountId){
         List<AccountOperation> accountOperations=accountOperationRepository.findByBankAccountId(accountId);
-        return accountOperations.stream().map(acco->entityMapper.fromEntity(acco)).collect(Collectors.toList());
+        return accountOperations.stream().map(entityMapper::fromEntity).collect(Collectors.toList());
     }
 
     @Override
     public AccountHistoryDTO accountHistoryPage(String accountId, int page, int size) throws BankAccountNotFoundException {
         BankAccount bankAccount=bankAccountRepository.findById(accountId)
                 .orElseThrow(()->new BankAccountNotFoundException("BankAccount not found"));
-        Page<AccountOperation> accountOperations=accountOperationRepository.findByBankAccountId(accountId, PageRequest.of(page,size));
+        Page<AccountOperation> accountOperations=accountOperationRepository.findByBankAccountIdOrderByDateDesc(accountId, PageRequest.of(page,size));
         AccountHistoryDTO accountHistoryDTO=new AccountHistoryDTO();
-        List<AccountOperationDTO> accountOperationDTOS=accountOperations.getContent().stream().map(accop->entityMapper.fromEntity(accop)).collect(Collectors.toList());
+        List<AccountOperationDTO> accountOperationDTOS=accountOperations.getContent().stream().map(entityMapper::fromEntity).collect(Collectors.toList());
         accountHistoryDTO.setAccountOperations(accountOperationDTOS);
         accountHistoryDTO.setAccountId(bankAccount.getId());
         accountHistoryDTO.setBalance(bankAccount.getBalance().doubleValue());
@@ -198,12 +198,19 @@ public class BankAccountServiceImpl implements BankAccountService{
     @Override
     public BankAccountPageDTO getBankAccountPage(String customerName, int page, int size){
         Page<BankAccount> bankAccounts=bankAccountRepository.findByCustomerNameContainingIgnoreCase(customerName, PageRequest.of(page,size));
-        List<BankAccountDTO> bankAccountDTOS=bankAccounts.getContent().stream().map(ba->entityMapper.fromEntity(ba)).collect(Collectors.toList());
+        List<BankAccountDTO> bankAccountDTOS=bankAccounts.getContent().stream().map(entityMapper::fromEntity).collect(Collectors.toList());
         BankAccountPageDTO bankAccountPageDTO=new BankAccountPageDTO();
         bankAccountPageDTO.setCurrentPage(page);
         bankAccountPageDTO.setTotalPages(bankAccounts.getTotalPages());
         bankAccountPageDTO.setPageSize(size);
         bankAccountPageDTO.setAccounts(bankAccountDTOS);
         return bankAccountPageDTO;
+    }
+
+    @Override
+    public List<BankAccountDTO> getCustomerAccounts(String customerId) throws CustomerNotFoundException {
+        Customer customer=customerRepository.findById(Long.valueOf(customerId)).orElse(null);
+        if(customer==null) throw new CustomerNotFoundException("Customer not found");
+        return customer.getBankAccounts().stream().map(entityMapper::fromEntity).collect(Collectors.toList());
     }
 }

@@ -2,6 +2,7 @@ package com.backend.bankingsystem.mapper;
 
 import com.backend.bankingsystem.dto.*;
 import com.backend.bankingsystem.model.*;
+import com.backend.bankingsystem.utils.UtilString;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -25,7 +26,7 @@ public interface EntityMapper {
     BankAccountDTO fromEntity(BankAccount bankAccount);
     @Named("getValueType")
     default String valueOfAttributeType(BankAccount bankAccount) {
-        return bankAccount.getClass().getSimpleName();
+        return UtilString.getCapitalLetters(bankAccount.getClass().getSimpleName());
     }
     @SubclassMapping(source = CurrentAccountDTO.class, target = CurrentAccount.class)
     @SubclassMapping(source = SavingAccountDTO.class, target = SavingAccount.class)
