@@ -7,8 +7,7 @@ import com.backend.bankingsystem.dto.CustomerDTO;
 import com.backend.bankingsystem.enums.UserRole;
 import com.backend.bankingsystem.exceptions.BadAmountException;
 import com.backend.bankingsystem.exceptions.BalanceNotSufficientException;
-import com.backend.bankingsystem.exceptions.BankAccountNotFoundException;
-import com.backend.bankingsystem.exceptions.CustomerNotFoundException;
+import com.backend.bankingsystem.exceptions.EntityNotFoundException;
 import com.backend.bankingsystem.mapper.EntityMapper;
 import com.backend.bankingsystem.model.AppRole;
 import com.backend.bankingsystem.model.AppUser;
@@ -47,7 +46,7 @@ public class AppServiceImpl implements AppService{
             try {
                 bankAccountService.createCurrentAccount(Math.random()*250000, customerDTO.getId(), Math.random()*500000);
                 bankAccountService.createSavingAccount(Math.random()*355000, customerDTO.getId(), Math.random()*500000);
-            } catch (CustomerNotFoundException e) {
+            } catch (EntityNotFoundException e) {
                 e.printStackTrace();
             }
         }
@@ -61,7 +60,7 @@ public class AppServiceImpl implements AppService{
                     double debitAmount=10+Math.random()*100000;
                     bankAccountService.credit(bankAccountDTO.getId(), creditAmount, "Credit "+creditAmount);
                     bankAccountService.debit(bankAccountDTO.getId(), debitAmount, "Debit "+debitAmount);
-                } catch (BankAccountNotFoundException | BalanceNotSufficientException | BadAmountException e) {
+                } catch (EntityNotFoundException | BalanceNotSufficientException | BadAmountException e) {
                     e.printStackTrace();
                 }
             }

@@ -22,7 +22,7 @@ public class BankAccountController {
     }
 
     @GetMapping("accounts/{id}")
-    public BankAccountDTO getBankAccount(@PathVariable(name = "id") String accountId) throws BankAccountNotFoundException {
+    public BankAccountDTO getBankAccount(@PathVariable(name = "id") String accountId) throws EntityNotFoundException {
        return bankAccountService.getBankAccount(accountId);
     }
 
@@ -36,22 +36,22 @@ public class BankAccountController {
             @PathVariable(name = "id") String accountId,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "5") int size
-    ) throws BankAccountNotFoundException {
+    ) throws EntityNotFoundException {
         return bankAccountService.accountHistoryPage(accountId, page, size);
     }
 
     @PostMapping("accounts/credit")
-    public BankAccountDTO credit(@RequestBody  CreditDTO creditDTO) throws BankAccountNotFoundException {
+    public BankAccountDTO credit(@RequestBody  CreditDTO creditDTO) throws EntityNotFoundException {
         return bankAccountService.credit(creditDTO.getAccountId(), creditDTO.getAmount(), creditDTO.getDesc());
     }
 
     @PostMapping("accounts/debit")
-    public BankAccountDTO debit(@RequestBody DebitDTO debitDTO) throws BankAccountNotFoundException, BalanceNotSufficientException, BadAmountException {
+    public BankAccountDTO debit(@RequestBody DebitDTO debitDTO) throws EntityNotFoundException, BalanceNotSufficientException, BadAmountException {
         return bankAccountService.debit(debitDTO.getAccountId(), debitDTO.getAmount(), debitDTO.getDesc());
     }
 
     @PostMapping("accounts/transfer")
-    public BankAccountDTO transfer(@RequestBody TransferDTO transferDTO) throws BankAccountNotFoundException, BalanceNotSufficientException, BadAmountException, SameAccountException {
+    public BankAccountDTO transfer(@RequestBody TransferDTO transferDTO) throws EntityNotFoundException, BalanceNotSufficientException, BadAmountException, SameAccountException {
         return bankAccountService.localTransfer(transferDTO.getAccountSourceId(), transferDTO.getAccountDestinationId(), transferDTO.getAmount());
     }
 
@@ -68,7 +68,7 @@ public class BankAccountController {
     @PreAuthorize("hasAuthority('SCOPE_USER')")
     public List<BankAccountDTO> customerBankAccounts(
         @PathVariable(name = "customerId") String customerId
-    ) throws CustomerNotFoundException {
+    ) throws EntityNotFoundException {
         return bankAccountService.getCustomerAccounts(customerId);
     }
 }

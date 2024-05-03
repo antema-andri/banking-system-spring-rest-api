@@ -57,9 +57,9 @@ public class BankAccountServiceImpl implements BankAccountService{
     }
 
     @Override
-    public CurrentAccountDTO createCurrentAccount(double balance, Long customerId, double overDraft) throws CustomerNotFoundException{
+    public CurrentAccountDTO createCurrentAccount(double balance, Long customerId, double overDraft) throws EntityNotFoundException{
         Customer customer=customerRepository.findById(customerId).orElse(null);
-        if(customer==null) throw new CustomerNotFoundException("Customer not found");
+        if(customer==null) throw new EntityNotFoundException("Customer not found");
         CurrentAccount currentAccount=new CurrentAccount();
         currentAccount.setId(UUID.randomUUID().toString());
         currentAccount.setBalance(BigDecimal.valueOf(balance));
@@ -73,9 +73,9 @@ public class BankAccountServiceImpl implements BankAccountService{
     }
 
     @Override
-    public SavingAccountDTO createSavingAccount(double balance, Long customerId, double interestRate) throws CustomerNotFoundException{
+    public SavingAccountDTO createSavingAccount(double balance, Long customerId, double interestRate) throws EntityNotFoundException{
         Customer customer=customerRepository.findById(customerId).orElse(null);
-        if(customer==null) throw new CustomerNotFoundException("Customer not found");
+        if(customer==null) throw new EntityNotFoundException("Customer not found");
         SavingAccount savingAccount=new SavingAccount();
         savingAccount.setId(UUID.randomUUID().toString());
         savingAccount.setBalance(BigDecimal.valueOf(balance));
@@ -107,19 +107,19 @@ public class BankAccountServiceImpl implements BankAccountService{
         return customers.stream().map(entityMapper::fromEntity).collect(Collectors.toList());
     }
 
-    BankAccount findBankAccount(String bankAccountId) throws BankAccountNotFoundException {
+    BankAccount findBankAccount(String bankAccountId) throws EntityNotFoundException {
         return bankAccountRepository.findById(bankAccountId)
-                .orElseThrow(()->new BankAccountNotFoundException("BankAccount not found"));
+                .orElseThrow(()->new EntityNotFoundException("BankAccount not found"));
     }
 
     @Override
-    public BankAccountDTO getBankAccount(String bankAccountId) throws BankAccountNotFoundException {
+    public BankAccountDTO getBankAccount(String bankAccountId) throws EntityNotFoundException {
         BankAccount bankAccount=findBankAccount(bankAccountId);
         return entityMapper.fromEntity(bankAccount);
     }
 
     @Override
-    public BankAccountDTO debit(String bankAccountId, double amount, String desc) throws BankAccountNotFoundException, BalanceNotSufficientException, BadAmountException {
+    public BankAccountDTO debit(String bankAccountId, double amount, String desc) throws EntityNotFoundException, BalanceNotSufficientException, BadAmountException {
         BankAccount bankAccount=findBankAccount(bankAccountId);
         if(amount<=0)
             throw new BadAmountException("Negative or null amount");
@@ -138,7 +138,7 @@ public class BankAccountServiceImpl implements BankAccountService{
     }
 
     @Override
-    public BankAccountDTO credit(String bankAccountId, double amount, String desc) throws BankAccountNotFoundException {
+    public BankAccountDTO credit(String bankAccountId, double amount, String desc) throws EntityNotFoundException {
         BankAccount bankAccount=findBankAccount(bankAccountId);
         AccountOperation accountOperation=new AccountOperation();
         accountOperation.setBankAccount(bankAccount);
@@ -153,7 +153,7 @@ public class BankAccountServiceImpl implements BankAccountService{
     }
 
     @Override
-    public BankAccountDTO localTransfer(String accountSourceId, String accountDestinationId, double amount) throws BankAccountNotFoundException, BalanceNotSufficientException, BadAmountException, SameAccountException {
+    public BankAccountDTO localTransfer(String accountSourceId, String accountDestinationId, double amount) throws EntityNotFoundException, BalanceNotSufficientException, BadAmountException, SameAccountException {
         if(accountSourceId.equals(accountDestinationId))
             throw new SameAccountException("Same sender and receiver account");
         BankAccountDTO debtorAccount=debit(accountSourceId, amount, "Transfer to "+accountDestinationId);
@@ -180,9 +180,9 @@ public class BankAccountServiceImpl implements BankAccountService{
     }
 
     @Override
-    public AccountHistoryDTO accountHistoryPage(String accountId, int page, int size) throws BankAccountNotFoundException {
+    public AccountHistoryDTO accountHistoryPage(String accountId, int page, int size) throws EntityNotFoundException {
         BankAccount bankAccount=bankAccountRepository.findById(accountId)
-                .orElseThrow(()->new BankAccountNotFoundException("BankAccount not found"));
+                .orElseThrow(()->new EntityNotFoundException("BankAccount not found"));
         Page<AccountOperation> accountOperations=accountOperationRepository.findByBankAccountIdOrderByDateDesc(accountId, PageRequest.of(page,size));
         AccountHistoryDTO accountHistoryDTO=new AccountHistoryDTO();
         List<AccountOperationDTO> accountOperationDTOS=accountOperations.getContent().stream().map(entityMapper::fromEntity).collect(Collectors.toList());
@@ -208,9 +208,9 @@ public class BankAccountServiceImpl implements BankAccountService{
     }
 
     @Override
-    public List<BankAccountDTO> getCustomerAccounts(String customerId) throws CustomerNotFoundException {
+    public List<BankAccountDTO> getCustomerAccounts(String customerId) throws EntityNotFoundException {
         Customer customer=customerRepository.findById(Long.valueOf(customerId)).orElse(null);
-        if(customer==null) throw new CustomerNotFoundException("Customer not found");
+        if(customer==null) throw new EntityNotFoundException("Customer not found");
         return customer.getBankAccounts().stream().map(entityMapper::fromEntity).collect(Collectors.toList());
     }
 }

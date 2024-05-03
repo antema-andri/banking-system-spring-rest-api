@@ -10,27 +10,27 @@ public interface BankAccountService {
     CustomerDTO getCustomer(Long customerId);
     CustomerDTO updateCustomer(CustomerDTO customerDTO);
     void deleteCustomer(Long idCustomer);
-    CurrentAccountDTO createCurrentAccount(double balance, Long customerId, double overDraft) throws CustomerNotFoundException;
-    SavingAccountDTO createSavingAccount(double balance, Long customerId, double interestRate) throws CustomerNotFoundException;
+    CurrentAccountDTO createCurrentAccount(double balance, Long customerId, double overDraft) throws EntityNotFoundException;
+    SavingAccountDTO createSavingAccount(double balance, Long customerId, double interestRate) throws EntityNotFoundException;
     List<CustomerDTO> listCustomers();
 
     List<CustomerDTO> findCustomers();
 
-    BankAccountDTO getBankAccount(String bankAccountId) throws BankAccountNotFoundException;
+    BankAccountDTO getBankAccount(String bankAccountId) throws EntityNotFoundException;
 
-    BankAccountDTO debit(String bankAccountId, double amount, String desc) throws BankAccountNotFoundException, BalanceNotSufficientException, BadAmountException;
+    BankAccountDTO debit(String bankAccountId, double amount, String desc) throws EntityNotFoundException, BalanceNotSufficientException, BadAmountException;
 
-    BankAccountDTO credit(String bankAccountId, double amount, String desc) throws BankAccountNotFoundException;
-    BankAccountDTO localTransfer(String accountSourceId, String accountDestinationId, double amount) throws BankAccountNotFoundException, BalanceNotSufficientException, BadAmountException, SameAccountException;
+    BankAccountDTO credit(String bankAccountId, double amount, String desc) throws EntityNotFoundException;
+    BankAccountDTO localTransfer(String accountSourceId, String accountDestinationId, double amount) throws EntityNotFoundException, BalanceNotSufficientException, BadAmountException, SameAccountException;
     List<BankAccountDTO> listBankAccount();
 
     List<CustomerDTO> searchCustomers(String world);
 
     List<AccountOperationDTO> accountHistory(String accountId);
 
-    AccountHistoryDTO accountHistoryPage(String accountId, int page, int size) throws BankAccountNotFoundException;
+    AccountHistoryDTO accountHistoryPage(String accountId, int page, int size) throws EntityNotFoundException;
 
     BankAccountPageDTO getBankAccountPage(String customerName, int page, int size);
 
-    List<BankAccountDTO> getCustomerAccounts(String customerId) throws CustomerNotFoundException;
+    List<BankAccountDTO> getCustomerAccounts(String customerId) throws EntityNotFoundException;
 }

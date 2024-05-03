@@ -6,7 +6,7 @@ import com.backend.bankingsystem.dao.CustomerRepository;
 import com.backend.bankingsystem.dto.AppRoleDTO;
 import com.backend.bankingsystem.dto.AppUserDTO;
 import com.backend.bankingsystem.enums.UserRole;
-import com.backend.bankingsystem.exceptions.CustomerNotFoundException;
+import com.backend.bankingsystem.exceptions.EntityNotFoundException;
 import com.backend.bankingsystem.exceptions.ExistingUsernameException;
 import com.backend.bankingsystem.exceptions.InvalidUserRoleException;
 import com.backend.bankingsystem.mapper.EntityMapper;
@@ -50,7 +50,7 @@ public class AppUserServiceImpl implements AppUserService{
     }
 
     @Override
-    public AppUserDTO createAppUser(String newUsername, String password, String customerId, String roleName) throws ExistingUsernameException, CustomerNotFoundException, InvalidUserRoleException {
+    public AppUserDTO createAppUser(String newUsername, String password, String customerId, String roleName) throws ExistingUsernameException, EntityNotFoundException, InvalidUserRoleException {
         AppUser appUser;
         AppRole appRole=appRoleRepository.findByRoleName(roleName);
         AppUser existingAppUser=appUserRepository.findByUsername(newUsername);
@@ -63,7 +63,7 @@ public class AppUserServiceImpl implements AppUserService{
         if(appRole.getRoleName().compareTo(UserRole.USER.name())==0){
             customerUser=customerRepository.findById(Long.parseLong(customerId)).orElse(null);
             if(customerUser==null){
-                throw new CustomerNotFoundException("No customer found for the new user");
+                throw new EntityNotFoundException("No customer found for the new user");
             }
         }
 

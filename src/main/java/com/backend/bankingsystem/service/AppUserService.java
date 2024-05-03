@@ -2,7 +2,7 @@ package com.backend.bankingsystem.service;
 
 import com.backend.bankingsystem.dto.AppRoleDTO;
 import com.backend.bankingsystem.dto.AppUserDTO;
-import com.backend.bankingsystem.exceptions.CustomerNotFoundException;
+import com.backend.bankingsystem.exceptions.EntityNotFoundException;
 import com.backend.bankingsystem.exceptions.ExistingUsernameException;
 import com.backend.bankingsystem.exceptions.InvalidUserRoleException;
 
@@ -15,5 +15,5 @@ public interface AppUserService {
 
     List<AppRoleDTO> getRoles();
 
-    AppUserDTO createAppUser(String newUsername, String password, String customerId, String roleName) throws ExistingUsernameException, CustomerNotFoundException, InvalidUserRoleException;
+    AppUserDTO createAppUser(String newUsername, String password, String customerId, String roleName) throws ExistingUsernameException, EntityNotFoundException, InvalidUserRoleException;
 }

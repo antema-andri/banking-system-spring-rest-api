@@ -3,7 +3,7 @@ package com.backend.bankingsystem.web;
 import com.backend.bankingsystem.dto.AppRoleDTO;
 import com.backend.bankingsystem.dto.AppUserDTO;
 import com.backend.bankingsystem.dto.InfoUserDTO;
-import com.backend.bankingsystem.exceptions.CustomerNotFoundException;
+import com.backend.bankingsystem.exceptions.EntityNotFoundException;
 import com.backend.bankingsystem.exceptions.ExistingUsernameException;
 import com.backend.bankingsystem.exceptions.InvalidUserRoleException;
 import com.backend.bankingsystem.service.AppUserService;
@@ -33,7 +33,7 @@ public class AppUserController {
 
     @PostMapping("users")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public AppUserDTO createAppUser(@RequestBody InfoUserDTO infoUserDTO) throws InvalidUserRoleException, ExistingUsernameException, CustomerNotFoundException {
+    public AppUserDTO createAppUser(@RequestBody InfoUserDTO infoUserDTO) throws InvalidUserRoleException, ExistingUsernameException, EntityNotFoundException {
         return appUserService.createAppUser(infoUserDTO.getUsername(),infoUserDTO.getPassword(),infoUserDTO.getCustomerId(),infoUserDTO.getRoleName());
     }
 }
