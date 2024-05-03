@@ -34,7 +34,7 @@ public class AppServiceImpl implements AppService{
         /* create customers */
         List<CustomerDTO> customerDTOList;
         try {
-            customerDTOList=UtilFileReader.readJsonArray("static/jsondata/customers.json",CustomerDTO.class);
+            customerDTOList=UtilFileReader.readJsonArray("jsondata/customers.json",CustomerDTO.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -76,7 +76,7 @@ public class AppServiceImpl implements AppService{
         List<AppUser> appUsers;
         int userNumber=2;
         try {
-            appUsers=UtilFileReader.readJsonArray("static/jsondata/users_test.json",AppUser.class);
+            appUsers=UtilFileReader.readJsonArray("jsondata/users_test.json",AppUser.class);
             int count=0;
             for (AppUser user:appUsers){
                 BCryptPasswordEncoder bCryptPasswordEncoder=new BCryptPasswordEncoder();
