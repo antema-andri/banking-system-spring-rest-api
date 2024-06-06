@@ -13,11 +13,13 @@ import com.backend.bankingsystem.mapper.EntityMapper;
 import com.backend.bankingsystem.model.AppRole;
 import com.backend.bankingsystem.model.AppUser;
 import com.backend.bankingsystem.model.Customer;
+import com.backend.bankingsystem.utils.UtilFileReader;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +31,32 @@ public class AppUserServiceImpl implements AppUserService{
     private final AppUserRepository appUserRepository;
     private final AppRoleRepository appRoleRepository;
     private final CustomerRepository customerRepository;
+
+    @Override
+    public void loadAppUsers(){
+        Customer customer=customerRepository.findById(1L).orElseThrow(()->new jakarta.persistence.EntityNotFoundException());
+        AppRole roleUser=appRoleRepository.findById(2L).orElseThrow();
+        AppRole roleAdmin=appRoleRepository.findById(1L).orElseThrow();
+        List<AppUserDTO> appUserDTOs;
+        int userNumber=2;
+        try {
+            appUserDTOs= UtilFileReader.readJsonArray("jsondata/users_test.json",AppUserDTO.class);
+            int count=0;
+            for (AppUserDTO userDTO:appUserDTOs){
+                if(count==0) {
+                    userDTO.setAppRole(entityMapper.fromEntity(roleAdmin));
+                }else{
+                    userDTO.setCustomer(entityMapper.fromEntity(customer));
+                    userDTO.setAppRole(entityMapper.fromEntity(roleUser));
+                }
+                this.createAppUser(userDTO);
+                count++;
+                if(count==userNumber) break;
+            }
+        } catch (IOException | ExistingUsernameException | EntityNotFoundException | InvalidUserRoleException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     public AppUserDTO getCurrentUser(String username) {
@@ -72,6 +100,31 @@ public class AppUserServiceImpl implements AppUserService{
         appUser.setPassword(new BCryptPasswordEncoder().encode(password));
         appUser.setAppRole(appRole);
         appUser.setCustomer(customerUser);
+        return entityMapper.fromEntity(appUserRepository.save(appUser));
+    }
+
+    @Override
+    public AppUserDTO createAppUser(AppUserDTO appUserDTO) throws ExistingUsernameException, EntityNotFoundException, InvalidUserRoleException{
+        AppUser appUser;
+        AppRole appRole=appRoleRepository.findByRoleName(appUserDTO.getAppRole().getRoleName());
+        AppUser existingAppUser=appUserRepository.findByUsername(appUserDTO.getUsername());
+        Customer customerUser;
+        String encodedPassword;
+
+        if(existingAppUser!=null){
+            throw new ExistingUsernameException("username: '"+appUserDTO.getUsername()+"' already exist");
+        }
+
+        if(appRole.getRoleName().compareTo(UserRole.USER.name())==0){
+            customerUser=customerRepository.findById(appUserDTO.getCustomer().getId()).orElse(null);
+            if(customerUser==null){
+                throw new EntityNotFoundException("No customer found for the new user");
+            }
+        }
+
+        encodedPassword=new BCryptPasswordEncoder().encode(appUserDTO.getPassword());
+        appUserDTO.setPassword(encodedPassword);
+        appUser=entityMapper.fromDTO(appUserDTO);
         return entityMapper.fromEntity(appUserRepository.save(appUser));
     }
 }

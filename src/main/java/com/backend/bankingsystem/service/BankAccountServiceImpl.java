@@ -7,7 +7,10 @@ import com.backend.bankingsystem.dto.*;
 import com.backend.bankingsystem.enums.AccountStatus;
 import com.backend.bankingsystem.enums.Currency;
 import com.backend.bankingsystem.enums.OperationType;
-import com.backend.bankingsystem.exceptions.*;
+import com.backend.bankingsystem.exceptions.BadAmountException;
+import com.backend.bankingsystem.exceptions.BalanceNotSufficientException;
+import com.backend.bankingsystem.exceptions.EntityNotFoundException;
+import com.backend.bankingsystem.exceptions.SameAccountException;
 import com.backend.bankingsystem.mapper.EntityMapper;
 import com.backend.bankingsystem.model.*;
 import lombok.AllArgsConstructor;
@@ -17,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -33,33 +35,38 @@ public class BankAccountServiceImpl implements BankAccountService{
     private final EntityMapper entityMapper;
 
     @Override
-    public CustomerDTO saveCustomer(CustomerDTO customerDTO) {
-        Customer customer=customerRepository.save(entityMapper.fromDTO(customerDTO));
-        return entityMapper.fromEntity(customer);
+    public void loadAccounts(){
+        List<Customer> customerList=customerRepository.findAll();
+        for (Customer customer:customerList){
+            try {
+                this.createCurrentAccount(Math.random()*250000, customer.getId(), Math.random()*500000);
+                this.createSavingAccount(Math.random()*355000, customer.getId(), Math.random()*500000);
+            } catch (EntityNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
-    public CustomerDTO getCustomer(Long customerId) {
-        Customer customer=customerRepository.findById(customerId).orElse(null);
-        return entityMapper.fromEntity(customer);
-    }
-
-    @Override
-    public CustomerDTO updateCustomer(CustomerDTO customerDTO) {
-        Customer customer=entityMapper.fromDTO(customerDTO);
-        Customer updatedCustomer=customerRepository.save(customer);
-        return entityMapper.fromEntity(updatedCustomer);
-    }
-
-    @Override
-    public void deleteCustomer(Long idCustomer) {
-        customerRepository.deleteById(idCustomer);
+    public void loadOperations(){
+        List<BankAccountDTO> bankAccountList=this.listBankAccount();
+        for(BankAccountDTO bankAccountDTO:bankAccountList){
+            for(int i=0; i<10; i++){
+                try {
+                    double creditAmount=10000+Math.random()*900000;
+                    double debitAmount=10+Math.random()*100000;
+                    this.credit(bankAccountDTO.getId(), creditAmount, "Credit "+creditAmount);
+                    this.debit(bankAccountDTO.getId(), debitAmount, "Debit "+debitAmount);
+                } catch (EntityNotFoundException | BalanceNotSufficientException | BadAmountException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     @Override
     public CurrentAccountDTO createCurrentAccount(double balance, Long customerId, double overDraft) throws EntityNotFoundException{
-        Customer customer=customerRepository.findById(customerId).orElse(null);
-        if(customer==null) throw new EntityNotFoundException("Customer not found");
+        Customer customer=customerRepository.findById(customerId).orElseThrow(()->new EntityNotFoundException("Customer not found"));
         CurrentAccount currentAccount=new CurrentAccount();
         currentAccount.setId(UUID.randomUUID().toString());
         currentAccount.setBalance(BigDecimal.valueOf(balance));
@@ -74,8 +81,7 @@ public class BankAccountServiceImpl implements BankAccountService{
 
     @Override
     public SavingAccountDTO createSavingAccount(double balance, Long customerId, double interestRate) throws EntityNotFoundException{
-        Customer customer=customerRepository.findById(customerId).orElse(null);
-        if(customer==null) throw new EntityNotFoundException("Customer not found");
+        Customer customer=customerRepository.findById(customerId).orElseThrow(()->new EntityNotFoundException("Customer not found"));
         SavingAccount savingAccount=new SavingAccount();
         savingAccount.setId(UUID.randomUUID().toString());
         savingAccount.setBalance(BigDecimal.valueOf(balance));
@@ -86,25 +92,6 @@ public class BankAccountServiceImpl implements BankAccountService{
         savingAccount.setInterestRate(interestRate);
         SavingAccountDTO savingAccountDTO=(SavingAccountDTO) entityMapper.fromEntity(bankAccountRepository.save(savingAccount));
         return savingAccountDTO;
-    }
-
-    @Override
-    public List<CustomerDTO> listCustomers() {
-        List<Customer> customers=customerRepository.findAll();
-        List<CustomerDTO> customerDTOs=new ArrayList<>();
-        for(Customer customer:customers){
-            CustomerDTO customerDTO=entityMapper.fromEntity(customer);
-            List<BankAccountDTO> bankAccountDTOList=entityMapper.bankAccountsToBankAccountDTOs(customer.getBankAccounts());
-            customerDTO.setBankAccounts(bankAccountDTOList);
-            customerDTOs.add(customerDTO);
-        }
-        return customerDTOs;
-    }
-
-    @Override
-    public List<CustomerDTO> findCustomers() {
-        List<Customer> customers=customerRepository.findByAppUserIsNull();
-        return customers.stream().map(entityMapper::fromEntity).collect(Collectors.toList());
     }
 
     BankAccount findBankAccount(String bankAccountId) throws EntityNotFoundException {
@@ -165,12 +152,6 @@ public class BankAccountServiceImpl implements BankAccountService{
     public List<BankAccountDTO> listBankAccount(){
         List<BankAccount> bankAccounts=bankAccountRepository.findAll();
         return bankAccounts.stream().map(entityMapper::fromEntity).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<CustomerDTO> searchCustomers(String word) {
-        List<Customer> customers=customerRepository.findByNameContainingIgnoreCase(word);
-        return customers.stream().map(entityMapper::fromEntity).collect(Collectors.toList());
     }
 
     @Override

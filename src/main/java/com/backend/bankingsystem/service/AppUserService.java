@@ -9,6 +9,8 @@ import com.backend.bankingsystem.exceptions.InvalidUserRoleException;
 import java.util.List;
 
 public interface AppUserService {
+    void loadAppUsers();
+
     AppUserDTO getCurrentUser(String username);
 
     List<AppUserDTO> getAppUsers();
@@ -16,4 +18,6 @@ public interface AppUserService {
     List<AppRoleDTO> getRoles();
 
     AppUserDTO createAppUser(String newUsername, String password, String customerId, String roleName) throws ExistingUsernameException, EntityNotFoundException, InvalidUserRoleException;
+
+    AppUserDTO createAppUser(AppUserDTO appUserDTO) throws ExistingUsernameException, EntityNotFoundException, InvalidUserRoleException;
 }
