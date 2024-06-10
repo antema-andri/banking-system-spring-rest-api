@@ -34,7 +34,8 @@ public class AppUserServiceImpl implements AppUserService{
 
     @Override
     public void loadAppUsers(){
-        Customer customer=customerRepository.findById(1L).orElseThrow(()->new jakarta.persistence.EntityNotFoundException());
+        Customer customer=customerRepository.findById(1L)
+                .orElseThrow(()->new jakarta.persistence.EntityNotFoundException());
         AppRole roleUser=appRoleRepository.findById(2L).orElseThrow();
         AppRole roleAdmin=appRoleRepository.findById(1L).orElseThrow();
         List<AppUserDTO> appUserDTOs;
@@ -78,53 +79,35 @@ public class AppUserServiceImpl implements AppUserService{
     }
 
     @Override
-    public AppUserDTO createAppUser(String newUsername, String password, String customerId, String roleName) throws ExistingUsernameException, EntityNotFoundException, InvalidUserRoleException {
-        AppUser appUser;
-        AppRole appRole=appRoleRepository.findByRoleName(roleName);
-        AppUser existingAppUser=appUserRepository.findByUsername(newUsername);
-        Customer customerUser=null;
-
-        if(existingAppUser!=null){
-            throw new ExistingUsernameException("username: '"+newUsername+"' already exist");
-        }
-
-        if(appRole.getRoleName().compareTo(UserRole.USER.name())==0){
-            customerUser=customerRepository.findById(Long.parseLong(customerId)).orElse(null);
-            if(customerUser==null){
-                throw new EntityNotFoundException("No customer found for the new user");
-            }
-        }
-
-        appUser=new AppUser();
-        appUser.setUsername(newUsername);
-        appUser.setPassword(new BCryptPasswordEncoder().encode(password));
-        appUser.setAppRole(appRole);
-        appUser.setCustomer(customerUser);
-        return entityMapper.fromEntity(appUserRepository.save(appUser));
-    }
-
-    @Override
     public AppUserDTO createAppUser(AppUserDTO appUserDTO) throws ExistingUsernameException, EntityNotFoundException, InvalidUserRoleException{
         AppUser appUser;
-        AppRole appRole=appRoleRepository.findByRoleName(appUserDTO.getAppRole().getRoleName());
-        AppUser existingAppUser=appUserRepository.findByUsername(appUserDTO.getUsername());
+        AppRole appRole;
+        AppUser existingAppUser;
         Customer customerUser;
         String encodedPassword;
 
+        existingAppUser=appUserRepository.findByUsername(appUserDTO.getUsername());
         if(existingAppUser!=null){
             throw new ExistingUsernameException("username: '"+appUserDTO.getUsername()+"' already exist");
         }
 
+        appRole=appRoleRepository.findByRoleName(appUserDTO.getAppRole().getRoleName())
+                .orElseThrow(()->new EntityNotFoundException("Role with name:"+appUserDTO.getAppRole().getRoleName()+" not found"));
+
         if(appRole.getRoleName().compareTo(UserRole.USER.name())==0){
-            customerUser=customerRepository.findById(appUserDTO.getCustomer().getId()).orElse(null);
-            if(customerUser==null){
-                throw new EntityNotFoundException("No customer found for the new user");
-            }
+            customerUser=customerRepository.findById(appUserDTO.getCustomer().getId())
+                    .orElseThrow(()->new EntityNotFoundException("No customer found for the new user"));
+            appUserDTO.setCustomer(entityMapper.fromEntity(customerUser));
+        }
+
+        if(appRole.getRoleName().compareTo(UserRole.ADMIN.name())==0){
+            appUserDTO.setCustomer(null);
         }
 
         encodedPassword=new BCryptPasswordEncoder().encode(appUserDTO.getPassword());
-        appUserDTO.setPassword(encodedPassword);
         appUser=entityMapper.fromDTO(appUserDTO);
+        appUser.setPassword(encodedPassword);
+        appUser.setAppRole(appRole);
         return entityMapper.fromEntity(appUserRepository.save(appUser));
     }
 }

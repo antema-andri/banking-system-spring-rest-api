@@ -17,7 +17,5 @@ public interface AppUserService {
 
     List<AppRoleDTO> getRoles();
 
-    AppUserDTO createAppUser(String newUsername, String password, String customerId, String roleName) throws ExistingUsernameException, EntityNotFoundException, InvalidUserRoleException;
-
     AppUserDTO createAppUser(AppUserDTO appUserDTO) throws ExistingUsernameException, EntityNotFoundException, InvalidUserRoleException;
 }
