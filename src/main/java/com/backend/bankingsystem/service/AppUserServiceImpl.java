@@ -34,15 +34,17 @@ public class AppUserServiceImpl implements AppUserService{
 
     @Override
     public void loadAppUsers(){
-        Customer customer=customerRepository.findById(1L)
-                .orElseThrow(()->new jakarta.persistence.EntityNotFoundException());
-        AppRole roleUser=appRoleRepository.findById(2L).orElseThrow();
-        AppRole roleAdmin=appRoleRepository.findById(1L).orElseThrow();
-        List<AppUserDTO> appUserDTOs;
-        int userNumber=2;
         try {
-            appUserDTOs= UtilFileReader.readJsonArray("jsondata/users_test.json",AppUserDTO.class);
+            Customer customer=customerRepository.findById(1L)
+                    .orElseThrow(()->new EntityNotFoundException("Cutomer not found"));
+            AppRole roleUser=appRoleRepository.findById(2L)
+                    .orElseThrow(()->new EntityNotFoundException("Role not found"));
+            AppRole roleAdmin=appRoleRepository.findById(1L)
+                    .orElseThrow(()->new EntityNotFoundException("Role not found"));
+            List<AppUserDTO> appUserDTOs= UtilFileReader.readJsonArray("jsondata/users_test.json",AppUserDTO.class);
             int count=0;
+            int userNumber=2;
+
             for (AppUserDTO userDTO:appUserDTOs){
                 if(count==0) {
                     userDTO.setAppRole(entityMapper.fromEntity(roleAdmin));
@@ -69,13 +71,13 @@ public class AppUserServiceImpl implements AppUserService{
     @Override
     public List<AppUserDTO> getAppUsers(){
         List<AppUser> appUsers=appUserRepository.findAll();
-        return appUsers.stream().map(appUser->entityMapper.fromEntity(appUser)).collect(Collectors.toList());
+        return appUsers.stream().map(entityMapper::fromEntity).collect(Collectors.toList());
     }
 
     @Override
     public List<AppRoleDTO> getRoles() {
         List<AppRole> roles=appRoleRepository.findAll();
-        return roles.stream().map(r->entityMapper.fromEntity(r)).collect(Collectors.toList());
+        return roles.stream().map(entityMapper::fromEntity).collect(Collectors.toList());
     }
 
     @Override
