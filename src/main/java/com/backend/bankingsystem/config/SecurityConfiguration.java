@@ -1,7 +1,7 @@
 package com.backend.bankingsystem.config;
 
 import com.backend.bankingsystem.service.AppUserService;
-import com.backend.bankingsystem.service.TokenServiceImpl;
+import com.backend.bankingsystem.service.TokenService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,12 +24,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfiguration {
-    private TokenServiceImpl tokenService;
+    private TokenService tokenService;
     private UserDetailsService userDetailsService;
     private AppUserService appUserService;
 
     public SecurityConfiguration(
-            TokenServiceImpl tokenService,
+            TokenService tokenService,
             UserDetailsService userDetailsService,
             AppUserService appUserService
     ){
