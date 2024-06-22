@@ -1,10 +1,11 @@
 package com.backend.bankingsystem.config;
 
 import com.backend.bankingsystem.service.AppUserService;
-import com.backend.bankingsystem.service.TokenService;
+import com.backend.bankingsystem.service.TokenServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -23,12 +24,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfiguration {
-    private TokenService tokenService;
+    private TokenServiceImpl tokenService;
     private UserDetailsService userDetailsService;
     private AppUserService appUserService;
 
     public SecurityConfiguration(
-            TokenService tokenService,
+            TokenServiceImpl tokenService,
             UserDetailsService userDetailsService,
             AppUserService appUserService
     ){
@@ -45,32 +46,25 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                AntPathRequestMatcher.antMatcher("/api/profile"),
                                 AntPathRequestMatcher.antMatcher("/api/auth/token"),
                                 AntPathRequestMatcher.antMatcher("/h2-console/**"),
                                 AntPathRequestMatcher.antMatcher("/health")
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
-                .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()))
-                .apply(this.initCustomDsl());
+                .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()));
         http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
         return http.build();
     }
 
-    public SecurCustomDsl initCustomDsl(){
-        SecurCustomDsl securCustomDsl=new SecurCustomDsl();
-        securCustomDsl.setTokenService(this.tokenService);
-        securCustomDsl.setAppUserService(this.appUserService);
-        return securCustomDsl;
-    }
-
     @Bean
-    public AuthenticationProvider authenticationProvider() {
+    public AuthenticationManager authenticationManager() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         BCryptPasswordEncoder bCryptPasswordEncoder=new BCryptPasswordEncoder();
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(bCryptPasswordEncoder);
-        return authProvider;
+        return new ProviderManager(authProvider);
     }
 
     @Bean
