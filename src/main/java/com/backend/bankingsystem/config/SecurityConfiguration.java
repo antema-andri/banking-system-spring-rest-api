@@ -1,7 +1,7 @@
 package com.backend.bankingsystem.config;
 
-import com.backend.bankingsystem.service.AppUserService;
-import com.backend.bankingsystem.service.TokenService;
+import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,28 +14,29 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import javax.crypto.spec.SecretKeySpec;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfiguration {
-    private TokenService tokenService;
-    private UserDetailsService userDetailsService;
-    private AppUserService appUserService;
+    @Value("${jwt.key}")
+    private String jwtKey;
+    private final UserDetailsService userDetailsService;
 
-    public SecurityConfiguration(
-            TokenService tokenService,
-            UserDetailsService userDetailsService,
-            AppUserService appUserService
-    ){
-        this.tokenService=tokenService;
+    public SecurityConfiguration(UserDetailsService userDetailsService){
         this.userDetailsService=userDetailsService;
-        this.appUserService=appUserService;
     }
 
     @Bean
@@ -64,6 +65,18 @@ public class SecurityConfiguration {
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(bCryptPasswordEncoder);
         return new ProviderManager(authProvider);
+    }
+
+    @Bean
+    JwtEncoder jwtEncoder() {
+        return new NimbusJwtEncoder(new ImmutableSecret<>(jwtKey.getBytes()));
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        byte[] bytes = jwtKey.getBytes();
+        SecretKeySpec originalKey = new SecretKeySpec(bytes, 0, bytes.length,"RSA");
+        return NimbusJwtDecoder.withSecretKey(originalKey).macAlgorithm(MacAlgorithm.HS512).build();
     }
 
     @Bean

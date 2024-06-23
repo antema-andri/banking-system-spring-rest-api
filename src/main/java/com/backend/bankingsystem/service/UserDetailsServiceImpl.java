@@ -1,7 +1,7 @@
-package com.backend.bankingsystem.config;
+package com.backend.bankingsystem.service;
 
+import com.backend.bankingsystem.dao.AppUserRepository;
 import com.backend.bankingsystem.model.AppUser;
-import com.backend.bankingsystem.service.AppAccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,11 +17,11 @@ import java.util.Collection;
 @Service
 @AllArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
-    private AppAccountService appAccountService;
+    private final AppUserRepository appUserRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        AppUser appUser=appAccountService.loadUserByUsername(username);
+        AppUser appUser=appUserRepository.findByUsername(username);
         if(appUser==null) throw new UsernameNotFoundException("INVALID USER");
         Collection<GrantedAuthority> authorities=new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(appUser.getAppRole().getRoleName()));
